@@ -12,9 +12,20 @@ var dino = {
   y: dinoy,
   width: 50,
   height: 50,
+  state: true,
   draw() {
     ctx.fillStyle = 'red';
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    // ctx.fillRect(this.x, this.y, this.width, this.height);
+    if (timer % 15 === 0) {
+      this.state = !this.state;
+    }
+    if (this.state) {
+      console.log('1');
+      ctx.drawImage(penguin1, this.x, this.y);
+    } else {
+      console.log('2');
+      ctx.drawImage(penguin2, this.x, this.y);
+    }
   },
 };
 
@@ -29,11 +40,16 @@ var sea = {
   },
 };
 
+var penguin1 = new Image();
+penguin1.src = 'penguin1.png';
+var penguin2 = new Image();
+penguin2.src = 'penguin2.png';
+
 class Cactus {
   constructor() {
     this.x = 500;
     this.y = 240;
-    this.width = 100;
+    this.width = 160;
     this.height = 10;
   }
   draw() {
@@ -43,22 +59,28 @@ class Cactus {
 }
 
 const fps = 25;
-var a = 10;
+var animation;
+var a = 2;
 var v0 = 0;
 var timer = 0;
 var jumpTimer = 0;
 var isJumping = false;
 var cactusArray = [];
+var cactusTemp = new Cactus();
+cactusTemp.x = 0;
+cactusTemp.width = 700;
+cactusArray.push(cactusTemp);
 
 function draw() {
-  setTimeout(() => {
-    requestAnimationFrame(draw);
-  }, 1000 / fps);
+  // setTimeout(() => {
+  //   animation = requestAnimationFrame(draw);
+  // }, 1000 / fps);
+  animation = requestAnimationFrame(draw);
   timer++;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (timer % 50 === 0) {
+  if (timer % 60 === 0) {
     var cactus = new Cactus();
     cactusArray.push(cactus);
   }
@@ -76,38 +98,40 @@ function draw() {
 
   var deleteArray = [];
   cactusArray.forEach((element, index, array) => {
-    element.x -= 5;
+    element.x -= 7;
     element.draw();
-    if (element.x < 0) {
+    if (element.x < -element.width) {
       deleteArray.push(index);
     }
     if (isCollision(dino, element)) {
-      console.log('col ice');
+      // console.log('col ice');
       isCollision2Ice = true;
     }
   });
   if (isCollision(dino, sea)) {
-    console.log('col sea');
+    // console.log('col sea');
     isCollision2Sea = true;
   }
 
   if (!isCollision2Ice && !isCollision2Sea) {
-    console.log('1');
+    // console.log('1');
     isJumping = true;
   } else if (isCollision2Ice) {
-    console.log('2');
+    // console.log('2');
     isJumping = false;
     if (dino.y > 190) {
       dino.y = 190;
       dinoy = 190;
     }
   } else if (isCollision2Sea) {
-    console.log('3');
+    // console.log('3');
     isJumping = false;
     if (dino.y > 200) {
       dino.y = 200;
       dinoy = 200;
     }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    cancelAnimationFrame(animation);
   }
 
   deleteArray.forEach((element, index, array) => {
@@ -122,7 +146,7 @@ draw();
 document.addEventListener('keydown', (event) => {
   if (event.code == 'Space') {
     console.log('clic');
-    v0 = -50;
+    v0 = -30;
     isJumping = true;
   }
 });
